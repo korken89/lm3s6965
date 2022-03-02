@@ -1,27 +1,18 @@
-//! A minimal device crate for the LM3S6965
-//!
-//! This device crate only contains interrupt bindings and it's main use case is running [Real Time
-//! For the Masses][rtfm] (RTFM) programs on QEMU.
-//!
-//! [rtfm]: https://github.com/japaric/cortex-m-rtfm
-//!
-//! **NOTE**: This crate targets Rust 1.31 so you'll need nightly or beta until that
-//! version is released.
-//!
-//! # References
-//!
-//! - [LM3S6965 data sheet](https://www.ti.com/lit/ds/symlink/lm3s6965.pdf)
+//! A minimal device crate for a generic target.
 
 #![deny(missing_docs)]
 #![deny(warnings)]
 #![no_std]
 
 pub use self::Interrupt as interrupt;
-use bare_metal::Nr;
 pub use cortex_m_rt::interrupt;
 
 /// Number of bits available in the NVIC for configuring priority
+#[cfg(armv7m)]
 pub const NVIC_PRIO_BITS: u8 = 3;
+/// Number of bits available in the NVIC for configuring priority
+#[cfg(not(armv7m))]
+pub const NVIC_PRIO_BITS: u8 = 2;
 
 /// Enumeration of all interrupts
 ///
@@ -32,144 +23,94 @@ pub const NVIC_PRIO_BITS: u8 = 3;
 #[derive(Clone, Copy)]
 pub enum Interrupt {
     /// GPIO Port A
-    GPIOA,
+    GPIOA = 0,
     /// GPIO Port B
-    GPIOB,
+    GPIOB = 1,
     /// GPIO Port C
-    GPIOC,
+    GPIOC = 2,
     /// GPIO Port D
-    GPIOD,
+    GPIOD = 3,
     /// GPIO Port E
-    GPIOE,
+    GPIOE = 4,
     /// UART0
-    UART0,
+    UART0 = 5,
     /// UART1
-    UART1,
+    UART1 = 6,
     /// SSI0
-    SSI0,
+    SSI0 = 7,
     /// I2C0
-    I2C0,
+    I2C0 = 8,
     /// PWM fault
-    PWM_FAULT,
+    PWM_FAULT = 9,
     /// PWM Generator 0
-    PWM_GENERATOR_0,
+    PWM_GENERATOR_0 = 10,
     /// PWM Generator 1
-    PWM_GENERATOR_1,
+    PWM_GENERATOR_1 = 11,
     /// PWM Generator 2
-    PWM_GENERATOR_2,
+    PWM_GENERATOR_2 = 12,
     /// QEI0
-    QEI0,
+    QEI0 = 13,
     /// ADC0 Sequence 0
-    ADC0_SEQUENCE_0,
+    ADC0_SEQUENCE_0 = 14,
     /// ADC0 Sequence 1
-    ADC0_SEQUENCE_1,
+    ADC0_SEQUENCE_1 = 15,
     /// ADC0 Sequence 2
-    ADC0_SEQUENCE_2,
+    ADC0_SEQUENCE_2 = 16,
     /// ADC0 Sequence 3
-    ADC0_SEQUENCE_3,
+    ADC0_SEQUENCE_3 = 17,
     /// Watchdog Timer 0
-    WATCHDOG_TIMER_0,
+    WATCHDOG_TIMER_0 = 18,
     /// Timer 0A
-    TIMER_0A,
+    TIMER_0A = 19,
     /// Timer 0B
-    TIMER_0B,
+    TIMER_0B = 20,
     /// Timer 1A
-    TIMER_1A,
+    TIMER_1A = 21,
     /// Timer 1B
-    TIMER_1B,
+    TIMER_1B = 22,
     /// Timer 2A
-    TIMER_2A,
+    TIMER_2A = 23,
     /// Timer 2B
-    TIMER_2B,
+    TIMER_2B = 24,
     /// Analog Comparator 0
-    ANALOG_COMPARATOR_0,
+    ANALOG_COMPARATOR_0 = 25,
     /// Analog Comparator 1
-    ANALOG_COMPARATOR_1,
+    ANALOG_COMPARATOR_1 = 26,
     /// System Control
-    SYSTEM_CONTROL,
+    SYSTEM_CONTROL = 28,
     /// Flash Memory Control
-    FLASH_MEMORY_CONTROL,
+    FLASH_MEMORY_CONTROL = 29,
     /// GPIO Port F
-    GPIOF,
+    GPIOF = 30,
     /// GPIO Port G
-    GPIOG,
+    GPIOG = 31,
     /// UART2
     #[cfg(armv7m)]
-    UART2,
+    UART2 = 33,
     /// Timer 3A
     #[cfg(armv7m)]
-    TIMER_3A,
+    TIMER_3A = 35,
     /// Timer 3B
     #[cfg(armv7m)]
-    TIMER_3B,
+    TIMER_3B = 36,
     /// I2C1
     #[cfg(armv7m)]
-    I2C1,
+    I2C1 = 37,
     /// QEI1
     #[cfg(armv7m)]
-    QEI1,
+    QEI1 = 38,
     /// Ethernet Controller
     #[cfg(armv7m)]
-    ETHERNET,
+    ETHERNET = 42,
     /// Hibernation Module
     #[cfg(armv7m)]
-    HIBERNATION,
+    HIBERNATION = 43,
 }
 
-unsafe impl Nr for Interrupt {
-    #[inline]
-    fn nr(&self) -> u8 {
-        match *self {
-            Interrupt::GPIOA => 0,
-            Interrupt::GPIOB => 1,
-            Interrupt::GPIOC => 2,
-            Interrupt::GPIOD => 3,
-            Interrupt::GPIOE => 4,
-            Interrupt::UART0 => 5,
-            Interrupt::UART1 => 6,
-            Interrupt::SSI0 => 7,
-            Interrupt::I2C0 => 8,
-            Interrupt::PWM_FAULT => 9,
-            Interrupt::PWM_GENERATOR_0 => 10,
-            Interrupt::PWM_GENERATOR_1 => 11,
-            Interrupt::PWM_GENERATOR_2 => 12,
-            Interrupt::QEI0 => 13,
-            Interrupt::ADC0_SEQUENCE_0 => 14,
-            Interrupt::ADC0_SEQUENCE_1 => 15,
-            Interrupt::ADC0_SEQUENCE_2 => 16,
-            Interrupt::ADC0_SEQUENCE_3 => 17,
-            Interrupt::WATCHDOG_TIMER_0 => 18,
-            Interrupt::TIMER_0A => 19,
-            Interrupt::TIMER_0B => 20,
-            Interrupt::TIMER_1A => 21,
-            Interrupt::TIMER_1B => 22,
-            Interrupt::TIMER_2A => 23,
-            Interrupt::TIMER_2B => 24,
-            Interrupt::ANALOG_COMPARATOR_0 => 25,
-            Interrupt::ANALOG_COMPARATOR_1 => 26,
-            // Interrupt::RESERVED => 27,
-            Interrupt::SYSTEM_CONTROL => 28,
-            Interrupt::FLASH_MEMORY_CONTROL => 29,
-            Interrupt::GPIOF => 30,
-            Interrupt::GPIOG => 31,
-            // Interrupt::RESERVED => 32,
-            #[cfg(armv7m)]
-            Interrupt::UART2 => 33,
-            // Interrupt::RESERVED => 34,
-            #[cfg(armv7m)]
-            Interrupt::TIMER_3A => 35,
-            #[cfg(armv7m)]
-            Interrupt::TIMER_3B => 36,
-            #[cfg(armv7m)]
-            Interrupt::I2C1 => 37,
-            #[cfg(armv7m)]
-            Interrupt::QEI1 => 38,
-            // Interrupt::RESERVED => 39...41,
-            #[cfg(armv7m)]
-            Interrupt::ETHERNET => 42,
-            #[cfg(armv7m)]
-            Interrupt::HIBERNATION => 43,
-        }
+unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {
+    #[inline(always)]
+    fn number(self) -> u16 {
+        self as u16
     }
 }
 

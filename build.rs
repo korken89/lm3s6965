@@ -5,6 +5,9 @@ fn main() {
     if target.starts_with("thumbv7m") || target.starts_with("thumbv7em") {
         println!("cargo:rustc-cfg=armv7m")
     }
+    if target.starts_with("thumbv6m") || target.starts_with("thumbv7em") {
+        println!("cargo:rustc-cfg=armv6m")
+    }
 
     let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
 
